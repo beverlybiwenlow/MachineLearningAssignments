@@ -1,0 +1,178 @@
+\documentclass{article}
+
+
+\usepackage[]{algorithm2e}
+
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{listings} 
+
+
+% Colors
+\definecolor{blu}{rgb}{0,0,1}
+\def\blu#1{{\color{blu}#1}}
+\definecolor{gre}{rgb}{0,.5,0}
+\def\gre#1{{\color{gre}#1}}
+\definecolor{red}{rgb}{1,0,0}
+\def\red#1{{\color{red}#1}}
+
+% Math
+\def\norm#1{\|#1\|}
+\def\R{\mathbb{R}}
+\def\argmax{\mathop{\rm arg\,max}}
+\def\argmin{\mathop{\rm arg\,min}}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\alignStar}[1]{\begin{align*}#1\end{align*}}
+
+% LaTeX
+\newcommand{\fig}[2]{\includegraphics[width=#1\textwidth]{#2}}
+\newcommand{\centerfig}[2]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}}
+\def\items#1{\begin{itemize}#1\end{itemize}}
+\def\enum#1{\begin{enumerate}#1\end{enumerate}}
+
+\def\rubric#1{\gre{Rubric: \{#1\}}}{}
+
+\begin{document}
+
+\title{CPSC 340 Assignment 1}
+
+\date{}
+\maketitle
+
+\vspace{-6em}
+
+\section{Data Exploration}
+
+\subsection{Summary Statistics}
+
+\enum{
+\item Minimum: 0.352
+\item Maximum: 4.862
+\item Mean: 1.325
+\item Median: 1.159
+\item Mode: 0.770
+\item 5th percentile: 0.465
+\item 25th percentile: 0.718
+\item 50th percentile: 1.159
+\item 75th percentile: 1.813
+\item 95th percentile: 2.624
+\item Highest mean is in WtdILI and lowest mean is in Pac.
+\item Highest variance is in Mtn and lowest variance is in Pac.
+}
+
+The mode is not the most reliable estimate of the most common value, since the values have to match exactly for it to count. Since values are continuous, a better way could be to plot a histogram of the values, and observe the frequency of the data from there.
+
+
+
+\subsection{Data Visualization}
+
+The figure contains the following plots, in a shuffled order:
+\enum{
+\item D; shows the frequency of illness percentages per region
+\item C; it shows the frequency of each illness percentage in the dataset
+\item B; it shows a boxplot for each week with the distribution of data
+\item A; it shows the change of illness percentages of each region from 0 to 50 weeks
+\item F; it is a scatterplot with points close to one another on a straight line
+\item E; it is a scatterplot with points not grouped onto a line (points are scattered around more randomly)
+}
+
+
+
+\section{Decision Trees}
+
+\subsection{Splitting rule}
+Features which have discrete values, eg. 0, 1, 2, 3, etc
+
+
+\subsection{Decision Stump Implementation}
+Error from using inequalities: 0.265
+
+
+\subsection{Constructing Decision Trees}
+
+Work done in code
+
+\subsection{Decision Tree Training Error}
+
+Using the model from sklearn, the error percentage of prediction decreases as the depth of the tree increases, plateau-ing when the depth of the tree is approximately >9. Similarly, using my model, the error percentage of prediction decreases as the depth of the tree increases. However, the performance plateau occurs much earlier at a depth of approximately 5. At depths >5, the classification error does not seem to deviate.
+
+This could be because the sklearn model is much more sophisticated than my model and thus provides better accuracy at bigger depths.
+
+
+\subsection{Cost of Fitting Decision Trees}
+O(m n d logn)
+
+Explanation:
+Cost of fitting a decision stump = O(nd logn). Assuming the stump splits into 2 submodels A and B (where A + B = n), the cost of fitting the decision stumps at the submodels = O(Ad logA) + O(Bd log B) which is approximately O(nd logn). Thus, cost is O(mnd log n) for a tree of depth m.
+
+
+\section{Training and Testing}
+
+\subsection{Training and Testing Error Curves}
+\fig{1}{training_and_testing_errors}
+
+As depth of the tree increases, both training and testing classification error decrease. However, while training error stays relatively constant for depths approximately >=5, testing error stays relatively constant for depths approximately >= 4. Furthermore, there seems to be slight increases in testing error when depth increases from 2 to 3, as well as from 4 to 5.
+
+\subsection{Validation Set}
+\fig{1}{training_and_validation_error}
+
+As shown, a decision tree depth of 5 would minimize the validation set error. This value does not change if the training and validation sets are switched. To estimate the depth more reliably, k-fold cross validation could be used.
+
+
+\section{K-Nearest Neighbours}
+
+\subsection{KNN Prediction}
+
+\enum{
+\item Predict function inside knn.py
+\item For k = 1, training error is 0 and test error is 0.065. For k = 3, training error is 0.028 and test error is 0.066. For k = 10, training error is 0.072 and test error is 0.097. These numbers are much lower than the training and test errors obtained using the decision tree.
+\item My KNN Plot, followed by KNeighborsClassifier Plot
+}
+\fig{1}{myKNNplot}
+\fig{1}{KNNeighboursPlot}
+
+4.   Training error is 0 for k = 1 because training had been done on that example before, and thus a match will always be found that is a distance of 0 away from the test data. Thus, it will always be labelled correctly.
+5.   Create a validation set and use this to do k-fold cross validation to obtain the best k.
+
+
+\subsection{Condensed Nearest Neighbours}
+\enum{
+\item CNN took 3.546399 seconds to make a prediction. Using KNN for this dataset, I stopped the process after 25s.
+\item Training error is 0.008 and testing error is 0.018. Number of variables in the subset is 457.
+\item CNN Plot:
+}
+\fig{1}{CNNPlot}
+
+\enum{
+\item Since the dataset is only a subset of all the data provided, there will be some error introduced when basing predictions on only 1 neighbour.
+\item O(dts)
+\item Training error is 0.138 and testing error is 0.210. Since there are only 30 samples in the subset of data used by CNN, underfitting occurs and the model is unable to accurately predict the training and test data.
+\item DecisionTreeClassifier took 0.032084 seconds. Training error: 0, Testing error: 0.012. Overall, I would prefer using decision trees for this data set as it works well with low testing error and is very fast.
+\item DecisionTreeClassifier Plot:
+}
+\fig{1}{DecisionTreeClassifierPlot}
+
+
+
+
+\section{Very-Short Answer Questions}
+
+\enum{
+\item We can make assumptions about test outputs by looking at nearby points on the scatterplot. Furthermore, a graph cannot really be used if the plots are too randomly scattered. Looking at the scatterplot before running machine learning algorithms might save time.
+\item Labels might depend on data from other instances. Furthermore, data might change over time and the distribution may not be the same.
+\item A validation set is used to choose hyper-parameters, and the best performing model. A test set is used to check the accuracy of the selected approach.
+\item The number of parameters grows with the size of the dataset. As such, fewer assumptions about the data is required, providing better results when the true data distribution is unknown or cannot be easily approximated.
+\item Standardization does not affect the accuracy of a decision tree classifier since both the split value and the sample value are scaled the same. However, KNN accuracy becomes better, as it reduces the scale of features with large values, which tend to dominate the distances and result in negligence of smaller-scale features. Standardization reduces this scale.
+\item There is no training phase in KNN as training data is merely stored, thus k does not affect it. Prediction runtimes are of O(nd), and thus increasing k would result in a linear increase in prediction runtime.
+\item Increasing k in KNN generally reduces the training error but increases the approximation error, as the impact of label noises cancel one another out. However, if k is too large, training error may increase and approximation error decrease as the majority class will be the main prediction in most cases.
+\item Increasing n decreases the training error, but also decreases how well the training error approximates the test error.
+}
+
+
+\end{document}
